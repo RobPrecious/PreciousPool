@@ -1,6 +1,36 @@
 import React from "react";
 import { database } from "../../utils/firebase";
 import { getDocs, collection, addDoc } from "firebase/firestore";
+import styled from "styled-components";
+
+const PlayerChoiceGrid = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 50px 1fr;
+  gap: 8px;
+  align-items: center;
+  text-align: center;
+  padding-bottom: 16px;
+`;
+
+const PlayerGroup = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+`;
+
+const PlayerSelect = styled.button<{ winning?: boolean }>`
+  background-color: lightblue;
+  font-weight: bolder;
+  border: none;
+  padding: 8px;
+  font-size: 1.25em;
+
+  ${(props) =>
+    props.winning &&
+    `
+    background: orange
+  `}
+`;
 
 type Player = {
   name: string;
@@ -45,59 +75,76 @@ export const PlayerChoice = () => {
   return (
     <div>
       {/* <button onClick={addPreviousDataToFirebase}>Export</button> */}
+      <PlayerChoiceGrid>
+        <h2>Player 1</h2>
+        <div />
+        <h2>Player 2</h2>
+      </PlayerChoiceGrid>
 
       {!playerOne && (
-        <div>
-          <h2>Player 1</h2>
-          {players.map((player: Player) => (
-            <button key={player.name} onClick={() => setPlayerOne(player)}>
-              {player.name}
-            </button>
-          ))}
-        </div>
+        <PlayerChoiceGrid>
+          <PlayerGroup>
+            {players.map((player: Player) => (
+              <PlayerSelect
+                key={player.name}
+                onClick={() => setPlayerOne(player)}
+              >
+                {player.name}
+              </PlayerSelect>
+            ))}
+          </PlayerGroup>
+          <div />
+        </PlayerChoiceGrid>
       )}
 
       {playerOne && !playerTwo && (
-        <div>
-          <div>
-            <h2>Player 1</h2>
+        <PlayerChoiceGrid>
+          <PlayerGroup>
             <p>{playerOne.name}</p>
-          </div>
-          <div>
-            <h2>Player 2</h2>
-
+          </PlayerGroup>
+          <div>vs</div>
+          <PlayerGroup>
             {players
               .filter((player) => player.name !== playerOne.name)
               .map((player: Player) => (
-                <button key={player.name} onClick={() => setPlayerTwo(player)}>
+                <PlayerSelect
+                  key={player.name}
+                  onClick={() => setPlayerTwo(player)}
+                >
                   {player.name}
-                </button>
+                </PlayerSelect>
               ))}
-          </div>
-        </div>
+          </PlayerGroup>
+        </PlayerChoiceGrid>
       )}
 
       {playerOne && playerTwo && (
         <div>
-          <button
-            data-winning={playerOne.name === winner?.name}
-            onClick={() => setWinner(playerOne)}
-          >
-            <h2>Player 1</h2>
-            <p>{playerOne.name}</p>
-          </button>
-          vs
-          <button
-            data-winning={playerTwo.name === winner?.name}
-            onClick={() => setWinner(playerTwo)}
-          >
-            <h2>Player 2</h2>
-            <p>{playerTwo.name}</p>
-          </button>
-          <div>
-            <button onClick={saveResult}>Save</button>
+          <PlayerChoiceGrid>
+            <PlayerGroup>
+              <PlayerSelect
+                winning={playerOne.name === winner?.name}
+                onClick={() => setWinner(playerOne)}
+              >
+                <p>{playerOne.name}</p>
+              </PlayerSelect>
+            </PlayerGroup>
+            <div>vs</div>
+            <PlayerGroup>
+              <PlayerSelect
+                winning={playerTwo.name === winner?.name}
+                onClick={() => setWinner(playerTwo)}
+              >
+                <p>{playerTwo.name}</p>
+              </PlayerSelect>
+            </PlayerGroup>
+          </PlayerChoiceGrid>
+          <PlayerGroup>
+            <PlayerSelect disabled={!winner} onClick={saveResult}>
+              Save
+            </PlayerSelect>
             Click on the winner to save
-          </div>
+          </PlayerGroup>
         </div>
       )}
     </div>
