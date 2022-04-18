@@ -1,13 +1,6 @@
 import React from "react";
 import { database } from "../../utils/firebase";
-import {
-  getDocs,
-  collection,
-  query,
-  orderBy,
-  limit,
-  onSnapshot,
-} from "firebase/firestore";
+import { getDocs, collection, query, orderBy, limit } from "firebase/firestore";
 
 type Record = {
   date: string;
@@ -36,12 +29,6 @@ export const History = () => {
   React.useEffect(() => {
     getHistory().then((history) => setHistory(history));
   }, []);
-
-  const q = query(collection(database, "record"));
-  const unsubscribe = onSnapshot(q, () => {
-    getHistory().then((history) => setHistory(history));
-  });
-  console.log(unsubscribe);
 
   return (
     <table>
