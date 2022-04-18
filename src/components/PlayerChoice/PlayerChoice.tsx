@@ -1,7 +1,6 @@
 import React from "react";
 import { database } from "../../utils/firebase";
 import { getDocs, collection, addDoc } from "firebase/firestore";
-import { addPreviousDataToFirebase } from "../../utils/export";
 
 type Player = {
   name: string;
