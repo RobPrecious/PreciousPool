@@ -2,6 +2,7 @@ import { createGlobalStyle } from "styled-components";
 import { Routes, Route, BrowserRouter } from "react-router-dom";
 import Home from "./pages/Home";
 import Settings from "./pages/Settings";
+import Players from "./pages/Players";
 
 const GlobalStyle = createGlobalStyle`
     html {
@@ -13,9 +14,7 @@ const GlobalStyle = createGlobalStyle`
 
     main {
       height: 85vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
+
     }
 
     body {
@@ -36,8 +35,9 @@ function App() {
           <h1>Precious Pool</h1>
         </header>
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/players" element={<Players />} />
           <Route path="/settings" element={<Settings />} />
+          <Route path="/" element={<Home />} />
         </Routes>
       </div>
     </BrowserRouter>
