@@ -1,7 +1,17 @@
 import React from "react";
 import { database } from "../../utils/firebase";
-import { getDocs, collection, addDoc } from "firebase/firestore";
+import {
+  getDocs,
+  collection,
+  addDoc,
+  query,
+  orderBy,
+} from "firebase/firestore";
 import styled from "styled-components";
+
+const PlayerChoiceContainer = styled.div`
+  text-align: center;
+`;
 
 const PlayerChoiceGrid = styled.div`
   display: grid;
@@ -9,13 +19,15 @@ const PlayerChoiceGrid = styled.div`
   gap: 8px;
   align-items: center;
   text-align: center;
-  padding-bottom: 16px;
+  padding-bottom: 8px;
 `;
 
 const PlayerGroup = styled.div`
   display: flex;
   flex-direction: column;
   gap: 8px;
+  max-height: 250px;
+  overflow: auto;
 `;
 
 const PlayerSelect = styled.button<{ winning?: boolean }>`
@@ -36,7 +48,7 @@ type Player = {
   name: string;
 };
 
-export const PlayerChoice = () => {
+export const PlayerChoice = (props: { onUpdate: () => void }) => {
   const [playerOne, setPlayerOne] = React.useState<Player | null>(null);
   const [playerTwo, setPlayerTwo] = React.useState<Player | null>(null);
   const [winner, setWinner] = React.useState<Player | null>(null);
@@ -44,12 +56,17 @@ export const PlayerChoice = () => {
 
   React.useEffect(() => {
     async function getPlayers() {
-      const querySnapshot = await getDocs(collection(database, "players"));
+      const recordRef = collection(database, "players");
+
+      const q = query(recordRef, orderBy("name", "asc"));
+
+      const querySnapshot = await getDocs(q);
 
       const results: any[] = [];
       querySnapshot.forEach((doc) => {
         results.push(doc.data());
       });
+
       return results;
     }
     getPlayers().then((players) => setPlayers(players));
@@ -66,6 +83,7 @@ export const PlayerChoice = () => {
       setPlayerOne(null);
       setPlayerTwo(null);
       setWinner(null);
+      props.onUpdate();
       console.log("Document written with ID: ", docRef.id);
     } catch (e) {
       console.error("Error adding document: ", e);
@@ -73,7 +91,9 @@ export const PlayerChoice = () => {
   };
 
   return (
-    <div>
+    <PlayerChoiceContainer>
+      {playerOne && playerTwo && <div>Pick a winner</div>}
+
       {/* <button onClick={addPreviousDataToFirebase}>Export</button> */}
       <PlayerChoiceGrid>
         <h2>Player 1</h2>
@@ -147,6 +167,6 @@ export const PlayerChoice = () => {
           </PlayerGroup>
         </div>
       )}
-    </div>
+    </PlayerChoiceContainer>
   );
 };
