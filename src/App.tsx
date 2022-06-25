@@ -3,7 +3,6 @@ import { Routes, Route, BrowserRouter } from "react-router-dom";
 import Home from "./pages/Home";
 import Settings from "./pages/Settings";
 import Players from "./pages/Players";
-import { addPreviousDataToFirebase } from "./utils/export";
 
 const GlobalStyle = createGlobalStyle`
 
