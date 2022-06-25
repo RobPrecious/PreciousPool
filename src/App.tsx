@@ -3,8 +3,10 @@ import { Routes, Route, BrowserRouter } from "react-router-dom";
 import Home from "./pages/Home";
 import Settings from "./pages/Settings";
 import Players from "./pages/Players";
+import { addPreviousDataToFirebase } from "./utils/export";
 
 const GlobalStyle = createGlobalStyle`
+
     html {
     }
 
@@ -32,7 +34,7 @@ function App() {
       <div className="App">
         <GlobalStyle />
         <header>
-          <h1>Precious Pool</h1>
+          <a href="/"><h1>Precious Pool</h1></a>
         </header>
         <Routes>
           <Route path="/players" element={<Players />} />
