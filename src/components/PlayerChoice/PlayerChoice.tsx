@@ -30,7 +30,8 @@ const PlayerGroup = styled.div`
 `;
 
 const PlayerSelect = styled.button<{ winning?: boolean }>`
-  background-color: lightblue;
+  background-color: #00008B;
+  color: white;
   font-weight: bolder;
   border: none;
   padding: 8px;
