@@ -36,7 +36,7 @@ export const History = (props: HistoryProps) => {
 
   React.useEffect(() => {
     const getHistory = async () => {
-      const recordRef = collection(database, "record");
+      const recordRef = collection(database, process.env.NODE_ENV === "development" ? "record_test" : "record");
 
       const q = query(recordRef, orderBy("date", "desc"), limit(props.limit));
 

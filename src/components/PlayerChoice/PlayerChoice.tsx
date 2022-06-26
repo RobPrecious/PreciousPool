@@ -53,6 +53,7 @@ export const PlayerChoice = (props: { onUpdate: () => void }) => {
   const [playerTwo, setPlayerTwo] = React.useState<Player | null>(null);
   const [winner, setWinner] = React.useState<Player | null>(null);
   const [players, setPlayers] = React.useState<Player[]>([]);
+  const [loading, setLoading] = React.useState<boolean>(false)
 
   React.useEffect(() => {
     async function getPlayers() {
@@ -73,8 +74,10 @@ export const PlayerChoice = (props: { onUpdate: () => void }) => {
   }, []);
 
   const saveResult = async () => {
+    setLoading(true)
+    
     try {
-      const docRef = await addDoc(collection(database, "record"), {
+      const docRef = await addDoc(collection(database, process.env.NODE_ENV === "development" ? "record_test" : "record"), {
         date: new Date().toISOString(),
         player_1: playerOne?.name,
         player_2: playerTwo?.name,
@@ -83,6 +86,7 @@ export const PlayerChoice = (props: { onUpdate: () => void }) => {
       setPlayerOne(null);
       setPlayerTwo(null);
       setWinner(null);
+      setLoading(false)
       props.onUpdate();
       console.log("Document written with ID: ", docRef.id);
     } catch (e) {
@@ -160,7 +164,7 @@ export const PlayerChoice = (props: { onUpdate: () => void }) => {
             </PlayerGroup>
           </PlayerChoiceGrid>
           <PlayerGroup>
-            <PlayerSelect disabled={!winner} onClick={saveResult}>
+            <PlayerSelect disabled={!winner && !loading} onClick={saveResult}>
               Save
             </PlayerSelect>
             Click on the winner to save
