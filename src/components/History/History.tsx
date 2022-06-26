@@ -12,6 +12,12 @@ const HistoryTable = styled.table`
   td {
     padding: 4px;
     border: 1px solid darkgrey;
+
+    & > div {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
   }
 
   .winner-cell {
@@ -19,11 +25,25 @@ const HistoryTable = styled.table`
   }
 `;
 
+
+const Ball= styled.div`
+  border: 1px solid black;
+  height: 10px;
+  width: 10px;
+  background-color: ${props => props.color};
+  color: ${props => props.color};
+  list-style: none;
+  border-radius: 50%;
+  font-size: 1px;
+`;
+
 type Record = {
   date: string;
   player_1: string;
   player_2: string;
   winner: string;
+  foulWin: boolean;
+  sevenedWin: boolean;
 };
 
 interface HistoryProps {
@@ -78,7 +98,7 @@ export const History = (props: HistoryProps) => {
               >
                 {game.player_2}
               </td>
-              <td>{game.winner}</td>
+              <td><div>{game.winner} {game.foulWin ? (<Ball color="black"/>) : null} {game.sevenedWin ? (<Ball color="blue"/>) : null}</div></td>
             </tr>
           ))}
         </tbody>

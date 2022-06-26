@@ -11,6 +11,10 @@ import styled from "styled-components";
 
 const PlayerChoiceContainer = styled.div`
   text-align: center;
+
+  h3, h4 {
+    margin: 8px 0;
+  }
 `;
 
 const PlayerChoiceGrid = styled.div`
@@ -44,9 +48,54 @@ const PlayerSelect = styled.button<{ winning?: boolean }>`
   `}
 `;
 
+const BallGroup = styled.ul`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 0;
+`;
+
+const BallDisplay = styled.li`
+  list-style: none;
+  border-radius: 50%;
+  font-size: 1px;
+`;
+
+const BallButton = styled.button`
+  border: 1px solid black;
+  height: 30px;
+  width: 30px;
+  background-color: ${props => props.color};
+  color: ${props => props.color};
+  list-style: none;
+  border-radius: 50%;
+  font-size: 1px;
+`;
+
+const MoreDetailsContainer = styled.div`
+  border: 1px solid black;
+  border-radius: 5px;
+  padding: 8px;
+`
+const AddResultContainer = styled.div`
+  display:flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 75%;
+  margin: 0 auto;
+  
+
+  & > div {
+    display: flex;
+    gap: 8px;
+    
+  }
+`
+
 type Player = {
   name: string;
 };
+type Ball = 'red' | 'yellow' | 'black'
 
 export const PlayerChoice = (props: { onUpdate: () => void }) => {
   const [playerOne, setPlayerOne] = React.useState<Player | null>(null);
@@ -54,6 +103,7 @@ export const PlayerChoice = (props: { onUpdate: () => void }) => {
   const [winner, setWinner] = React.useState<Player | null>(null);
   const [players, setPlayers] = React.useState<Player[]>([]);
   const [loading, setLoading] = React.useState<boolean>(false)
+  const [game, setGame] = React.useState<Ball[]>([])
 
   React.useEffect(() => {
     async function getPlayers() {
@@ -82,11 +132,15 @@ export const PlayerChoice = (props: { onUpdate: () => void }) => {
         player_1: playerOne?.name,
         player_2: playerTwo?.name,
         winner: winner?.name,
+        game,
+        foulWin: game.filter(c => c === 'yellow').length < 7 &&  game.filter(c => c === 'red').length < 7,
+        sevenedWin: (game.filter(c => c === 'yellow').length === 0 &&  game.filter(c => c === 'red').length === 7) || (game.filter(c => c === 'red').length === 0 &&  game.filter(c => c === 'yellow').length === 7)
       });
       setPlayerOne(null);
       setPlayerTwo(null);
       setWinner(null);
       setLoading(false)
+      setGame([])
       props.onUpdate();
       console.log("Document written with ID: ", docRef.id);
     } catch (e) {
@@ -94,11 +148,34 @@ export const PlayerChoice = (props: { onUpdate: () => void }) => {
     }
   };
 
+  const addBall = (color: Ball) => {
+    const numberOfRed = game.filter(c => c === 'red')
+    const numberOfYellow = game.filter(c => c === 'yellow')
+    const numberOfBlack = game.filter(c => c === 'black')
+
+    if(color === 'red' && numberOfRed.length < 7 && numberOfBlack.length < 1){
+      setGame([...game, color])
+    }
+
+    if(color === 'yellow' && numberOfYellow.length < 7 && numberOfBlack.length < 1){
+      setGame([...game, color])
+    }
+
+    if(color === 'black' && numberOfBlack.length < 1){
+      setGame([...game, color])
+    }
+  }
+
+  const removeBall = (index: number) =>{
+    const newGame = [...game]
+    newGame.splice(index, 1)
+    setGame(newGame)
+  }
+
   return (
     <PlayerChoiceContainer>
       {playerOne && playerTwo && <div>Pick a winner</div>}
 
-      {/* <button onClick={addPreviousDataToFirebase}>Export</button> */}
       <PlayerChoiceGrid>
         <h2>Player 1</h2>
         <div />
@@ -164,6 +241,25 @@ export const PlayerChoice = (props: { onUpdate: () => void }) => {
             </PlayerGroup>
           </PlayerChoiceGrid>
           <PlayerGroup>
+            <MoreDetailsContainer>
+              <AddResultContainer>
+                <h3>Add Full result</h3>
+                <div>
+                  <BallButton color="yellow" onClick={() => addBall('yellow')}>Yellow</BallButton>
+                  <BallButton color="red" onClick={() => addBall('red')}>Red</BallButton>
+                  <BallButton color="black" onClick={() => addBall('black')}>Black</BallButton>
+                </div>
+              </AddResultContainer>
+              <BallGroup>
+                  {game.map((ball, index) => {
+                    return (
+                      <BallDisplay key={`ball-${index}`}>
+                        <BallButton onClick={() => removeBall(index)} color={ball}>{ball}</BallButton>
+                      </BallDisplay>
+                    )
+                  })}
+              </BallGroup>
+            </MoreDetailsContainer>
             <PlayerSelect disabled={!winner && !loading} onClick={saveResult}>
               Save
             </PlayerSelect>
@@ -171,6 +267,8 @@ export const PlayerChoice = (props: { onUpdate: () => void }) => {
           </PlayerGroup>
         </div>
       )}
+
+     
     </PlayerChoiceContainer>
   );
 };
